@@ -1,16 +1,23 @@
+// app/layout.tsx
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Registration Team",
+  title: "NSI Conference | Onsite Registration System",
   description:
-    "Comprehensive event management with badge printing, scanning, and certificates",
-  keywords: ["event management", "badge printing", "scanning", "certificates"],
+    "Neurological Society of India - Private Practitioners Forum Conference Registration System",
+  keywords: [
+    "NSI",
+    "Neurological Society",
+    "Conference",
+    "Registration",
+    "Badge Printing",
+    "Certificate",
+  ],
 };
 
 export default function RootLayout({
@@ -21,10 +28,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <AuthProvider>
-          {children}
-          <Toaster />
-        </AuthProvider>
+        {children}
+        <Toaster />
       </body>
     </html>
   );

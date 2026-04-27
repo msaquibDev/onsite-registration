@@ -1,210 +1,192 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import PageLayout from "@/components/PageLayout";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { ArrowLeft, Search, Printer } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import Link from "next/link";
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
+import { Search, Printer, Pencil } from "lucide-react";
 
 interface Attendee {
   id: string;
-  registration_number: string;
   name: string;
-  email: string;
-  organization: string;
-  designation: string;
   category: string;
-  badge_printed: boolean;
+  city: string;
+  mobile: string;
+  email: string;
+  printed: boolean;
+  printedAt?: string;
 }
 
-export default function BadgePrintingSearchPage() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [attendees, setAttendees] = useState<Attendee[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [searching, setSearching] = useState(false);
+export default function BadgePrintingPage() {
   const { toast } = useToast();
-  const router = useRouter();
 
-  const handleSearch = async () => {
-    if (!searchQuery.trim()) {
+  const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState<Attendee[]>([]);
+
+  // 🔥 Mock Data
+  const mockData: Attendee[] = [
+    {
+      id: "REG001",
+      name: "Sapna Prajapat",
+      category: "Speaker",
+      city: "Bangalore",
+      mobile: "1234567891",
+      email: "xyz@gmail.com",
+      printed: false,
+    },
+    {
+      id: "REG002",
+      name: "Sapna Prajapat",
+      category: "Delegate",
+      city: "Bangalore",
+      mobile: "1234567891",
+      email: "xyz@gmail.com",
+      printed: true,
+      printedAt: "Aug 2, 2025 at 18:47",
+    },
+  ];
+
+  const handleSearch = () => {
+    if (!query.trim()) {
       toast({
-        title: "Error",
-        description: "Please enter a search query",
+        title: "Enter search value",
         variant: "destructive",
       });
       return;
     }
 
-    setSearching(true);
-    try {
-      const { data, error } = await supabase
-        .from("attendees")
-        .select("*")
-        .or(
-          `registration_number.ilike.%${searchQuery}%,name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%`
-        )
-        .order("name");
+    setLoading(true);
 
-      if (error) throw error;
-
-      setAttendees(data || []);
-
-      if (data?.length === 0) {
-        toast({
-          title: "No Results",
-          description: "No attendees found matching your search",
-        });
-      }
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to search attendees",
-        variant: "destructive",
-      });
-    } finally {
-      setSearching(false);
-    }
+    setTimeout(() => {
+      setData(mockData);
+      setLoading(false);
+    }, 700);
   };
 
-  const handlePrintBadge = async (attendeeId: string) => {
-    setLoading(true);
-    try {
-      const { error } = await supabase
-        .from("attendees")
-        .update({ badge_printed: true, updated_at: new Date().toISOString() })
-        .eq("id", attendeeId);
+  const handlePrint = (id: string) => {
+    setData((prev) =>
+      prev.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              printed: true,
+              printedAt: new Date().toLocaleString(),
+            }
+          : item,
+      ),
+    );
 
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Badge printed successfully",
-      });
-
-      setAttendees((prev) =>
-        prev.map((att) =>
-          att.id === attendeeId ? { ...att, badge_printed: true } : att
-        )
-      );
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to print badge",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
+    toast({
+      title: "Badge Printed",
+    });
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
-      <header className="bg-blue-950 shadow-sm border-b">
-        <div className="container mx-auto px-4 py-4 flex items-center gap-4">
-          <Link href="/dashboard">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="w-5 h-5 text-white hover:text-blue-950" />
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold text-primary text-white">
-              Badge Printing - Search
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Search and print attendee badges
-            </p>
-          </div>
+    <PageLayout title="Badge Printing">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* 🔍 Search */}
+        <div className="flex gap-3">
+          <Input
+            placeholder="Search registered attendees"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="h-12 rounded-full px-5"
+          />
+          <Button
+            onClick={handleSearch}
+            className="bg-[#D96F28] hover:bg-[#C15D20] text-white rounded-full px-6"
+          >
+            <Search className="w-4 h-4 mr-2" />
+            {loading ? "Searching..." : "Search"}
+          </Button>
         </div>
-      </header>
 
-      <main className="container mx-auto px-4 py-8 max-w-6xl">
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Search Attendees</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <Label htmlFor="search">
-                  Search by Registration Number, Name, or Email
-                </Label>
-                <Input
-                  id="search"
-                  placeholder="Enter registration number, name, or email..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-                  className="mt-2"
-                />
-              </div>
-              <div className="flex items-end">
-                <Button
-                  onClick={handleSearch}
-                  disabled={searching}
-                  className="gap-2"
-                >
-                  <Search className="w-4 h-4" />
-                  {searching ? "Searching..." : "Search"}
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* 📊 Table */}
+        <div className="rounded-xl border bg-white shadow-sm overflow-hidden">
+          <Table>
+            <TableHeader className="bg-[#EBD5C3]">
+              <TableRow>
+                <TableHead>Action</TableHead>
+                <TableHead>UID / Reg#</TableHead>
+                <TableHead>Full Name</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>City / 2nd Line</TableHead>
+                <TableHead>Mobile</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Date/Time</TableHead>
+              </TableRow>
+            </TableHeader>
 
-        {attendees.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Search Results ({attendees.length})</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {attendees.map((attendee) => (
-                  <div
-                    key={attendee.id}
-                    className="flex items-center justify-between p-4 border rounded-lg bg-white hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="font-semibold text-lg">
-                          {attendee.name}
-                        </h3>
-                        <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full">
-                          {attendee.registration_number}
-                        </span>
-                        {attendee.badge_printed && (
-                          <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full">
-                            Badge Printed
-                          </span>
-                        )}
-                      </div>
-                      <div className="text-sm text-muted-foreground space-y-1">
-                        <p>{attendee.email}</p>
-                        <p>
-                          {attendee.organization} • {attendee.designation}
-                        </p>
-                        <p>Category: {attendee.category}</p>
-                      </div>
-                    </div>
-                    <Button
-                      onClick={() => handlePrintBadge(attendee.id)}
-                      disabled={loading || attendee.badge_printed}
-                      className="gap-2"
-                    >
-                      <Printer className="w-4 h-4" />
-                      {attendee.badge_printed ? "Printed" : "Print Badge"}
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-      </main>
-    </div>
+            <TableBody>
+              {data.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={8} className="text-center py-6">
+                    No data found
+                  </TableCell>
+                </TableRow>
+              ) : (
+                data.map((item) => (
+                  <TableRow key={item.id}>
+                    {/* ACTION */}
+                    <TableCell className="flex gap-2">
+                      {item.printed ? (
+                        <Button
+                          size="sm"
+                          className="bg-red-600 hover:bg-red-700"
+                        >
+                          <Printer className="w-4 h-4 mr-1" />
+                          Printed
+                        </Button>
+                      ) : (
+                        <Button
+                          size="sm"
+                          onClick={() => handlePrint(item.id)}
+                          className="bg-green-600 hover:bg-green-700"
+                        >
+                          <Printer className="w-4 h-4 mr-1" />
+                          Print
+                        </Button>
+                      )}
+
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                      >
+                        <Pencil className="w-4 h-4 mr-1" />
+                        Edit
+                      </Button>
+                    </TableCell>
+
+                    {/* DATA */}
+                    <TableCell>{item.id}</TableCell>
+                    <TableCell>{item.name}</TableCell>
+                    <TableCell>{item.category}</TableCell>
+                    <TableCell>{item.city}</TableCell>
+                    <TableCell>{item.mobile}</TableCell>
+                    <TableCell>{item.email}</TableCell>
+
+                    {/* DATE */}
+                    <TableCell>{item.printed ? item.printedAt : "-"}</TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+    </PageLayout>
   );
 }
