@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 //app/certificate/page.tsx
+=======
+>>>>>>> ca619b680e6a91521bf5020c2d2a67f7ac270c58
 "use client";
 
 import { Button } from "@/components/ui/button";

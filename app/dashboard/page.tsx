@@ -102,6 +102,12 @@ export default function DashboardPage() {
     },
     {
       icon: IdCard,
+      title: "Self Badge Printing",
+      href: "/self-badge-printing",
+      bgColor: "bg-orange-500",
+    },
+    {
+      icon: Printer,
       title: "Badge Printing Kiosk",
       href: "/self-badge-printing",
       bgColor: "bg-orange-500",
@@ -147,6 +153,12 @@ export default function DashboardPage() {
       title: "Add Registration",
       href: "/add-registration",
       bgColor: "bg-rose-500",
+    },
+    {
+      icon: IdCard,
+      title: "Self Badge Printing",
+      href: "/self-badge-printing",
+      bgColor: "bg-orange-500",
     },
   ];
 
