@@ -1,3 +1,4 @@
+//app/scan/multi-entry/[type]/page.tsx
 import MultiScanClientPage from "./MultiScanClientPage";
 
 export function generateStaticParams() {

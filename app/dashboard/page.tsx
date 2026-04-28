@@ -97,15 +97,21 @@ export default function DashboardPage() {
     {
       icon: Award,
       title: "Certificate Printing",
-      href: "/certificate/search",
+      href: "/certificate",
       bgColor: "bg-purple-500",
     },
     {
-      icon: Printer,
+      icon: IdCard,
       title: "Badge Printing Kiosk",
       href: "/self-badge-printing",
       bgColor: "bg-orange-500",
     },
+    // {
+    //   icon: Printer,
+    //   title: "Badge Printing Kiosk",
+    //   href: "/self-badge-printing",
+    //   bgColor: "bg-orange-500",
+    // },
     {
       icon: Award,
       title: "Certificate Printing Kiosk",
@@ -118,35 +124,29 @@ export default function DashboardPage() {
       href: "/attendance-scanning",
       bgColor: "bg-indigo-500",
     },
-    {
-      icon: Search,
-      title: "Manual Search",
-      href: "/manual-search",
-      bgColor: "bg-cyan-500",
-    },
-    {
-      icon: UserPlus,
-      title: "Visitor Registration",
-      href: "/visitor-registration",
-      bgColor: "bg-teal-500",
-    },
-    {
-      icon: Globe,
-      title: "Scan by Website",
-      href: "/scan-by-website",
-      bgColor: "bg-amber-500",
-    },
+    // {
+    //   icon: Search,
+    //   title: "Manual Search",
+    //   href: "/manual-search",
+    //   bgColor: "bg-cyan-500",
+    // },
+    // {
+    //   icon: UserPlus,
+    //   title: "Visitor Registration",
+    //   href: "/visitor-registration",
+    //   bgColor: "bg-teal-500",
+    // },
+    // {
+    //   icon: Globe,
+    //   title: "Scan by Website",
+    //   href: "/scan-by-website",
+    //   bgColor: "bg-amber-500",
+    // },
     {
       icon: UserPlus,
       title: "Add Registration",
       href: "/add-registration",
       bgColor: "bg-rose-500",
-    },
-    {
-      icon: IdCard,
-      title: "Self Badge Printing",
-      href: "/self-badge-printing",
-      bgColor: "bg-orange-500",
     },
   ];
 

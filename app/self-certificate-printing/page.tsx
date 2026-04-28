@@ -1,124 +1,203 @@
 "use client";
 
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { ArrowLeft, Award } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
-import { useToast } from '@/hooks/use-toast';
-import Link from 'next/link';
+import { useState } from "react";
+import PageLayout from "@/components/PageLayout";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Scan, QrCode, Search } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+
+interface Attendee {
+  id: string;
+  regNo: string;
+  name: string;
+  category: string;
+  city: string;
+  printed: boolean;
+  printedAt?: string;
+}
 
 export default function SelfCertificatePrintingPage() {
-  const [registrationNumber, setRegistrationNumber] = useState('');
-  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  const handlePrint = async () => {
-    if (!registrationNumber.trim()) {
+  const [tab, setTab] = useState("scan");
+  const [input, setInput] = useState("");
+  const [results, setResults] = useState<Attendee[]>([]);
+
+  // ✅ DUMMY DATA
+  const dummyData: Attendee[] = [
+    {
+      id: "1",
+      regNo: "REG001",
+      name: "Dr. Sharma",
+      category: "Delegate",
+      city: "Delhi",
+      printed: false,
+    },
+    {
+      id: "2",
+      regNo: "REG002",
+      name: "Dr. Rao",
+      category: "Faculty",
+      city: "Hyderabad",
+      printed: true,
+      printedAt: new Date().toISOString(),
+    },
+  ];
+
+  const handleSearch = () => {
+    if (!input.trim()) {
       toast({
         title: "Error",
-        description: "Please enter your registration number",
+        description: "Please enter value",
         variant: "destructive",
       });
       return;
     }
 
-    setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('attendees')
-        .select('*')
-        .eq('registration_number', registrationNumber.trim())
-        .maybeSingle();
+    const filtered = dummyData.filter(
+      (d) =>
+        d.regNo.toLowerCase().includes(input.toLowerCase()) ||
+        d.name.toLowerCase().includes(input.toLowerCase()),
+    );
 
-      if (error) throw error;
+    setResults(filtered);
 
-      if (!data) {
-        toast({
-          title: "Not Found",
-          description: "No registration found with this number",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      await supabase.from('certificates').insert({
-        attendee_id: data.id,
-        event_id: data.event_id,
-        certificate_type: 'participation',
-        printed: true,
-      });
-
-      await supabase
-        .from('attendees')
-        .update({ certificate_printed: true })
-        .eq('id', data.id);
-
+    if (filtered.length === 0) {
       toast({
-        title: "Success",
-        description: `Certificate for ${data.name} is being printed`,
+        title: "No Result",
+        description: "No attendee found",
       });
-
-      setRegistrationNumber('');
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to print certificate",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
-      <header className="bg-blue-950 shadow-sm border-b">
-        <div className="container mx-auto px-4 py-4 flex items-center gap-4">
-          <Link href="/dashboard">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="w-5 h-5 text-white hover:text-blue-950" />
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold text-primary text-white">Self Certificate Printing</h1>
-            <p className="text-sm text-muted-foreground">Print your certificate</p>
-          </div>
-        </div>
-      </header>
+  const handleScan = () => {
+    // simulate scan
+    const random = Math.random();
+    if (random > 0.5) {
+      setResults([dummyData[0]]);
+      toast({ title: "Scan Success" });
+    } else {
+      setResults([]);
+      toast({
+        title: "Invalid QR",
+        variant: "destructive",
+      });
+    }
+  };
 
-      <main className="container mx-auto px-4 py-8 max-w-2xl">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Award className="w-6 h-6" />
-              Print Your Certificate
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="regNumber">Registration Number</Label>
-              <Input
-                id="regNumber"
-                placeholder="Enter your registration number"
-                value={registrationNumber}
-                onChange={(e) => setRegistrationNumber(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handlePrint()}
-                className="mt-2 h-12 text-lg"
-              />
-            </div>
+  const formatDate = (date?: string) => {
+    if (!date) return "-";
+    return new Date(date).toLocaleString("en-IN");
+  };
+
+  return (
+    <PageLayout title="Self Certificate Printing" showSignOut>
+      <div className="max-w-5xl mx-auto space-y-6">
+        {/* ✅ Certificate Preview */}
+        <div className="text-center">
+          <img
+            src="/preview-badge.png"
+            alt="Certificate Preview"
+            className="mx-auto w-72 border rounded-lg shadow"
+          />
+        </div>
+
+        {/* ✅ Tabs */}
+        <Tabs value={tab} onValueChange={setTab}>
+          <TabsList className="grid grid-cols-2">
+            <TabsTrigger value="scan">Scan your QR Code</TabsTrigger>
+            <TabsTrigger value="search">Search Name / Reg No</TabsTrigger>
+          </TabsList>
+        </Tabs>
+
+        {/* ✅ Scan Tab */}
+        {tab === "scan" && (
+          <div className="text-center space-y-4 border rounded-lg p-6">
+            <QrCode className="mx-auto w-16 h-16" />
+            <p className="text-gray-600">Scan your QR Code</p>
+
             <Button
-              onClick={handlePrint}
-              disabled={loading}
-              className="w-full h-12 text-base"
+              onClick={handleScan}
+              className="bg-[#D96F28] hover:bg-[#C15D20] text-white"
             >
-              {loading ? 'Printing...' : 'Print Certificate'}
+              <Scan className="w-4 h-4 mr-2" />
+              Start Scan
             </Button>
-          </CardContent>
-        </Card>
-      </main>
-    </div>
+          </div>
+        )}
+
+        {/* ✅ Search Tab */}
+        {tab === "search" && (
+          <div className="flex gap-3">
+            <Input
+              placeholder="Enter Name or Registration Number"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            />
+            <Button
+              onClick={handleSearch}
+              className="bg-[#D96F28] hover:bg-[#C15D20] text-white"
+            >
+              <Search className="w-4 h-4 mr-2" />
+              Search
+            </Button>
+          </div>
+        )}
+
+        {/* ✅ Table */}
+        {results.length > 0 && (
+          <div className="border rounded-lg overflow-hidden">
+            <Table>
+              <TableHeader className="bg-[#EBD5C3]">
+                <TableRow>
+                  <TableHead>Reg No</TableHead>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>City</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Printed At</TableHead>
+                </TableRow>
+              </TableHeader>
+
+              <TableBody>
+                {results.map((r) => (
+                  <TableRow key={r.id}>
+                    <TableCell>{r.regNo}</TableCell>
+                    <TableCell>{r.name}</TableCell>
+                    <TableCell>{r.category}</TableCell>
+                    <TableCell>{r.city}</TableCell>
+
+                    <TableCell>
+                      <span
+                        className={`px-2 py-1 rounded text-xs ${
+                          r.printed
+                            ? "bg-red-100 text-red-700"
+                            : "bg-green-100 text-green-700"
+                        }`}
+                      >
+                        {r.printed ? "Printed" : "Print"}
+                      </span>
+                    </TableCell>
+
+                    <TableCell>{formatDate(r.printedAt)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
+      </div>
+    </PageLayout>
   );
 }

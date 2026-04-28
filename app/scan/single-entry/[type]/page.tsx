@@ -1,4 +1,3 @@
-// ✅ required for static export
 //app/scan/single-entry/[type]/page.tsx
 
 import ScanClientPage from "./ScanClientPage";

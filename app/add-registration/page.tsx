@@ -1,280 +1,240 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
+import PageLayout from "@/components/PageLayout";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
   Select,
-  SelectContent,
-  SelectItem,
   SelectTrigger,
   SelectValue,
+  SelectContent,
+  SelectItem,
 } from "@/components/ui/select";
-import { ArrowLeft, UserPlus } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import Link from "next/link";
 
 export default function AddRegistrationPage() {
-  const [formData, setFormData] = useState({
-    registrationNumber: "",
-    name: "",
-    email: "",
-    phone: "",
-    organization: "",
-    designation: "",
-    category: "delegate",
-  });
-  const [loading, setLoading] = useState(false);
-  const [eventId, setEventId] = useState<string>("");
   const { toast } = useToast();
 
-  useEffect(() => {
-    loadOrCreateEvent();
-  }, []);
+  // ✅ TRUE = Allowed (Green) | FALSE = Not Allowed (Red)
+  const [scanAllowed, setScanAllowed] = useState(true);
 
-  const loadOrCreateEvent = async () => {
-    try {
-      const { data: events, error: fetchError } = await supabase
-        .from("events")
-        .select("id")
-        .eq("status", "active")
-        .limit(1)
-        .maybeSingle();
+  const [formData, setFormData] = useState({
+    name: "",
+    place: "",
+    category: "",
+    mobile: "",
+    email: "",
+    reference: "",
+    permissions: [] as string[],
+  });
 
-      if (fetchError) throw fetchError;
+  const options = [
+    "Kit Bag",
+    "Day 3 Lunch",
+    "Day 1 Dinner",
+    "Day 1 Lunch",
+    "Day 2 Hall",
+    "Day 2 Lunch",
+    "Day 2 Breakfast",
+    "Day 2 Entry Scanning",
+    "Day 3 Breakfast",
+    "Day 2 Dinner",
+    "Day 1 Breakfast",
+    "T-Shirt",
+  ];
 
-      if (events) {
-        setEventId(events.id);
-      } else {
-        const { data: newEvent, error: createError } = await supabase
-          .from("events")
-          .insert({
-            name: "Default Event",
-            start_date: new Date().toISOString(),
-            end_date: new Date(
-              Date.now() + 7 * 24 * 60 * 60 * 1000
-            ).toISOString(),
-          })
-          .select()
-          .single();
-
-        if (createError) throw createError;
-        setEventId(newEvent.id);
-      }
-    } catch (error: any) {
-      console.error("Error loading event:", error);
-    }
+  // 🔥 Toggle Permissions
+  const togglePermission = (item: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      permissions: prev.permissions.includes(item)
+        ? prev.permissions.filter((i) => i !== item)
+        : [...prev.permissions, item],
+    }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!formData.registrationNumber || !formData.name || !formData.email) {
+  const handleSubmit = (type: "save" | "print") => {
+    if (!formData.name || !formData.category) {
       toast({
         title: "Error",
-        description: "Please fill in all required fields",
+        description: "Please fill required fields",
         variant: "destructive",
       });
       return;
     }
 
-    if (!eventId) {
-      toast({
-        title: "Error",
-        description: "No active event found",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const { error } = await supabase.from("attendees").insert({
-        event_id: eventId,
-        registration_number: formData.registrationNumber,
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        organization: formData.organization,
-        designation: formData.designation,
-        category: formData.category,
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Registration added successfully",
-      });
-
-      setFormData({
-        registrationNumber: "",
-        name: "",
-        email: "",
-        phone: "",
-        organization: "",
-        designation: "",
-        category: "delegate",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to add registration",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
+    toast({
+      title: "Success",
+      description:
+        type === "print" ? "Saved & Printing (dummy)" : "Saved successfully",
+    });
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
-      <header className="bg-blue-950 shadow-sm border-b">
-        <div className="container mx-auto px-4 py-4 flex items-center gap-4">
-          <Link href="/dashboard">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="w-5 h-5 text-white hover:text-blue-950" />
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold text-primary text-white">
-              Add Registration
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Register a new attendee
-            </p>
-          </div>
-        </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-8 max-w-3xl">
+    <PageLayout
+      title="Add Registration"
+      showBackButton
+      backButtonHref="/dashboard"
+      showSignOut
+    >
+      <div className="max-w-5xl mx-auto p-6 space-y-6">
+        {/* 🔹 FORM */}
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <UserPlus className="w-6 h-6" />
-              New Registration
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="regNumber">Registration Number *</Label>
-                  <Input
-                    id="regNumber"
-                    value={formData.registrationNumber}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        registrationNumber: e.target.value,
-                      })
-                    }
-                    placeholder="e.g., REG2024001"
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="category">Category *</Label>
-                  <Select
-                    value={formData.category}
-                    onValueChange={(value) =>
-                      setFormData({ ...formData, category: value })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="delegate">Delegate</SelectItem>
-                      <SelectItem value="speaker">Speaker</SelectItem>
-                      <SelectItem value="vip">VIP</SelectItem>
-                      <SelectItem value="sponsor">Sponsor</SelectItem>
-                      <SelectItem value="media">Media</SelectItem>
-                      <SelectItem value="staff">Staff</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+          <CardContent className="p-6 space-y-5">
+            <div>
+              <Label>Full Name *</Label>
+              <Input
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+              />
+            </div>
 
-              <div>
-                <Label htmlFor="name">Full Name *</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  placeholder="Enter full name"
-                  required
-                />
-              </div>
+            <div>
+              <Label>Place / 2nd Line on Badge</Label>
+              <Input
+                value={formData.place}
+                onChange={(e) =>
+                  setFormData({ ...formData, place: e.target.value })
+                }
+              />
+            </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="email">Email *</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
-                    placeholder="email@example.com"
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="phone">Phone</Label>
-                  <Input
-                    id="phone"
-                    value={formData.phone}
-                    onChange={(e) =>
-                      setFormData({ ...formData, phone: e.target.value })
-                    }
-                    placeholder="+1 234 567 8900"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <Label htmlFor="organization">Organization</Label>
-                <Input
-                  id="organization"
-                  value={formData.organization}
-                  onChange={(e) =>
-                    setFormData({ ...formData, organization: e.target.value })
-                  }
-                  placeholder="Enter organization name"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="designation">Designation</Label>
-                <Input
-                  id="designation"
-                  value={formData.designation}
-                  onChange={(e) =>
-                    setFormData({ ...formData, designation: e.target.value })
-                  }
-                  placeholder="e.g., Manager, Director, Professor"
-                />
-              </div>
-
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full h-11 text-base"
+            <div>
+              <Label>Registration / Badge Category *</Label>
+              <Select
+                value={formData.category}
+                onValueChange={(val) =>
+                  setFormData({ ...formData, category: val })
+                }
               >
-                <UserPlus className="w-4 h-4 mr-2" />
-                {loading ? "Adding Registration..." : "Add Registration"}
-              </Button>
-            </form>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="delegate">Delegate</SelectItem>
+                  <SelectItem value="faculty">Faculty</SelectItem>
+                  <SelectItem value="speaker">Speaker</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Mobile Number</Label>
+                <Input
+                  value={formData.mobile}
+                  onChange={(e) =>
+                    setFormData({ ...formData, mobile: e.target.value })
+                  }
+                />
+              </div>
+
+              <div>
+                <Label>Email</Label>
+                <Input
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label>Reference / Note *</Label>
+              <Input
+                value={formData.reference}
+                onChange={(e) =>
+                  setFormData({ ...formData, reference: e.target.value })
+                }
+              />
+            </div>
           </CardContent>
         </Card>
-      </main>
-    </div>
+
+        {/* 🔥 ALLOW / NOT ALLOW (FIXED LOGIC) */}
+        <div className="rounded-md p-5 bg-[#FFEADA] border space-y-4">
+          <p className="text-sm font-medium">Not Allowed in Single Scanning</p>
+
+          <div className="flex items-center gap-6">
+            {/* ❌ NOT ALLOWED */}
+            <div
+              onClick={() => setScanAllowed(false)}
+              className="flex items-center gap-2 cursor-pointer"
+            >
+              <Checkbox checked={!scanAllowed} />
+              <span className="text-red-600 font-medium">Not Allowed</span>
+            </div>
+
+            {/* ✅ ALLOWED */}
+            <div
+              onClick={() => setScanAllowed(true)}
+              className="flex items-center gap-2 cursor-pointer"
+            >
+              <Checkbox checked={scanAllowed} />
+              <span className="text-green-600 font-medium">Allowed</span>
+            </div>
+          </div>
+        </div>
+
+        {/* 🔥 PERMISSIONS WITH DYNAMIC COLOR */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          {options.map((item) => {
+            const isChecked = formData.permissions.includes(item);
+
+            return (
+              <div
+                key={item}
+                className={`flex items-center gap-2 border rounded-md p-2 cursor-pointer ${
+                  isChecked
+                    ? scanAllowed
+                      ? "border-green-500 bg-green-50"
+                      : "border-red-500 bg-red-50"
+                    : ""
+                }`}
+                onClick={() => togglePermission(item)}
+              >
+                <Checkbox checked={isChecked} />
+
+                <span
+                  className={`text-sm ${
+                    isChecked
+                      ? scanAllowed
+                        ? "text-green-700"
+                        : "text-red-600"
+                      : ""
+                  }`}
+                >
+                  {item}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* 🔥 BUTTONS */}
+        <div className="flex gap-4">
+          <Button
+            onClick={() => handleSubmit("save")}
+            className="flex-1 bg-[#D96F28] hover:bg-[#C15D20]"
+          >
+            Save & Submit
+          </Button>
+
+          <Button
+            onClick={() => handleSubmit("print")}
+            className="flex-1 bg-green-600 hover:bg-green-700"
+          >
+            Submit & Print
+          </Button>
+        </div>
+      </div>
+    </PageLayout>
   );
 }

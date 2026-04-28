@@ -1,3 +1,4 @@
+//app/scan/multi-entry/[type]/MultiScanClientPage.tsx
 "use client";
 
 import { useState } from "react";
