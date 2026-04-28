@@ -4,11 +4,9 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { ArrowLeft, Search, Award } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { Search, Award, Edit } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import Link from "next/link";
+import PageLayout from "@/components/PageLayout";
 
 interface Attendee {
   id: string;
@@ -18,17 +16,56 @@ interface Attendee {
   organization: string;
   designation: string;
   category: string;
+  city?: string;
+  mobile?: string;
   certificate_printed: boolean;
+  printed_at?: string;
   event_id: string;
 }
 
-export default function CertificateSearchPage() {
+export default function CertificateSearchPage({ type }: { type?: string }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [attendees, setAttendees] = useState<Attendee[]>([]);
-  const [loading, setLoading] = useState(false);
   const [searching, setSearching] = useState(false);
   const { toast } = useToast();
 
+  const formattedType = (type || "certificate")
+    .replace(/-/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+
+  // 🔥 DUMMY DATA
+  const dummyData: Attendee[] = [
+    {
+      id: "1",
+      registration_number: "DEL001",
+      name: "Dr. Sharma",
+      email: "sharma@gmail.com",
+      organization: "AIIMS",
+      designation: "Doctor",
+      category: "Delegate",
+      city: "Delhi",
+      mobile: "9876543210",
+      certificate_printed: false,
+      printed_at: "",
+      event_id: "1",
+    },
+    {
+      id: "2",
+      registration_number: "FAC002",
+      name: "Dr. Rao",
+      email: "rao@gmail.com",
+      organization: "Apollo",
+      designation: "Faculty",
+      category: "Faculty",
+      city: "Hyderabad",
+      mobile: "9123456780",
+      certificate_printed: true,
+      printed_at: new Date().toISOString(),
+      event_id: "1",
+    },
+  ];
+
+  // 🔍 SEARCH (Dummy)
   const handleSearch = async () => {
     if (!searchQuery.trim()) {
       toast({
@@ -40,184 +77,164 @@ export default function CertificateSearchPage() {
     }
 
     setSearching(true);
-    try {
-      const { data, error } = await supabase
-        .from("attendees")
-        .select("*")
-        .or(
-          `registration_number.ilike.%${searchQuery}%,name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%`
-        )
-        .order("name");
 
-      if (error) throw error;
+    setTimeout(() => {
+      const filtered = dummyData.filter(
+        (item) =>
+          item.registration_number
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.email.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
 
-      setAttendees(data || []);
+      setAttendees(filtered);
 
-      if (data?.length === 0) {
+      if (filtered.length === 0) {
         toast({
           title: "No Results",
-          description: "No attendees found matching your search",
+          description: "No attendees found",
         });
       }
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to search attendees",
-        variant: "destructive",
-      });
-    } finally {
+
       setSearching(false);
-    }
+    }, 500); // simulate API delay
   };
 
-  const handlePrintCertificate = async (attendee: Attendee) => {
-    setLoading(true);
-    try {
-      const { error: certError } = await supabase.from("certificates").insert({
-        attendee_id: attendee.id,
-        event_id: attendee.event_id,
-        certificate_type: "participation",
-        printed: true,
-      });
+  // 🖨 PRINT (Dummy)
+  const handlePrintCertificate = (attendee: Attendee) => {
+    const now = new Date().toISOString();
 
-      if (certError) throw certError;
+    setAttendees((prev) =>
+      prev.map((att) =>
+        att.id === attendee.id
+          ? { ...att, certificate_printed: true, printed_at: now }
+          : att,
+      ),
+    );
 
-      const { error: updateError } = await supabase
-        .from("attendees")
-        .update({
-          certificate_printed: true,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", attendee.id);
+    toast({
+      title: "Success",
+      description: "Certificate printed (dummy)",
+    });
+  };
 
-      if (updateError) throw updateError;
-
-      toast({
-        title: "Success",
-        description: "Certificate printed successfully",
-      });
-
-      setAttendees((prev) =>
-        prev.map((att) =>
-          att.id === attendee.id ? { ...att, certificate_printed: true } : att
-        )
-      );
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to print certificate",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
+  const formatDateTime = (date?: string) => {
+    if (!date) return "-";
+    return new Date(date).toLocaleString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
-      <header className="bg-blue-950 shadow-sm border-b">
-        <div className="container mx-auto px-4 py-4 flex items-center gap-4">
-          <Link href="/dashboard">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="w-5 h-5 text-white hover:text-blue-950" />
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold text-primary text-white">
-              Certificate Printing - Search
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Search and print certificates
-            </p>
-          </div>
-        </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-8 max-w-6xl">
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Search Attendees</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <Label htmlFor="search">
-                  Search by Registration Number, Name, or Email
-                </Label>
-                <Input
-                  id="search"
-                  placeholder="Enter registration number, name, or email..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-                  className="mt-2"
-                />
-              </div>
-              <div className="flex items-end">
-                <Button
-                  onClick={handleSearch}
-                  disabled={searching}
-                  className="gap-2"
-                >
-                  <Search className="w-4 h-4" />
-                  {searching ? "Searching..." : "Search"}
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {attendees.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Search Results ({attendees.length})</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {attendees.map((attendee) => (
-                  <div
-                    key={attendee.id}
-                    className="flex items-center justify-between p-4 border rounded-lg bg-white hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="font-semibold text-lg">
-                          {attendee.name}
-                        </h3>
-                        <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full">
-                          {attendee.registration_number}
-                        </span>
-                        {attendee.certificate_printed && (
-                          <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full">
-                            Certificate Printed
-                          </span>
-                        )}
-                      </div>
-                      <div className="text-sm text-muted-foreground space-y-1">
-                        <p>{attendee.email}</p>
-                        <p>
-                          {attendee.organization} • {attendee.designation}
-                        </p>
-                        <p>Category: {attendee.category}</p>
-                      </div>
-                    </div>
-                    <Button
-                      onClick={() => handlePrintCertificate(attendee)}
-                      disabled={loading || attendee.certificate_printed}
-                      className="gap-2"
-                    >
-                      <Award className="w-4 h-4" />
-                      {attendee.certificate_printed
-                        ? "Printed"
-                        : "Print Certificate"}
-                    </Button>
-                  </div>
-                ))}
-              </div>
+    <div className="min-h-screen bg-gray-50">
+      <PageLayout
+        title={`Certificate Printing : ${formattedType}`}
+        showBackButton={true}
+        backButtonHref="/certificate"
+        showSignOut={true}
+      >
+        <main className="p-6 max-w-7xl mx-auto">
+          {/* 🔍 SEARCH */}
+          <Card className="mb-6">
+            <CardContent className="p-4 flex gap-4">
+              <Input
+                placeholder="Scan / Enter Reg No / Name / Email"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              />
+              <Button
+                onClick={handleSearch}
+                disabled={searching}
+                className="bg-[#D96F28] hover:bg-[#C15D20] text-white"
+              >
+                <Search className="w-4 h-4 mr-2" />
+                {searching ? "Searching..." : "Search"}
+              </Button>
             </CardContent>
           </Card>
-        )}
-      </main>
+
+          {/* 📊 TABLE */}
+          {attendees.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Results ({attendees.length})</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm border">
+                    <thead className="bg-gray-100 text-left">
+                      <tr>
+                        <th className="p-2 border">UID / Reg No</th>
+                        <th className="p-2 border">Full Name</th>
+                        <th className="p-2 border">Category</th>
+                        <th className="p-2 border">City / Org</th>
+                        <th className="p-2 border">Mobile</th>
+                        <th className="p-2 border">Email</th>
+                        <th className="p-2 border">Printed At</th>
+                        <th className="p-2 border text-center">Action</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {attendees.map((att) => (
+                        <tr key={att.id} className="hover:bg-gray-50">
+                          <td className="p-2 border">
+                            {att.registration_number}
+                          </td>
+                          <td className="p-2 border font-medium">{att.name}</td>
+                          <td className="p-2 border">{att.category}</td>
+                          <td className="p-2 border">
+                            {att.city || "-"} <br />
+                            <span className="text-xs text-gray-500">
+                              {att.organization}
+                            </span>
+                          </td>
+                          <td className="p-2 border">{att.mobile || "-"}</td>
+                          <td className="p-2 border">{att.email}</td>
+                          <td className="p-2 border">
+                            {formatDateTime(att.printed_at)}
+                          </td>
+
+                          <td className="p-2 border text-center space-x-2">
+                            <Button
+                              size="sm"
+                              onClick={() => handlePrintCertificate(att)}
+                              className={
+                                att.certificate_printed
+                                  ? "bg-red-500 hover:bg-red-600"
+                                  : "bg-green-600 hover:bg-green-700"
+                              }
+                            >
+                              <Award className="w-4 h-4 mr-1" />
+                              {att.certificate_printed ? "Printed" : "Print"}
+                            </Button>
+
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() =>
+                                alert("Edit feature implement here")
+                              }
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </main>
+      </PageLayout>
     </div>
   );
 }

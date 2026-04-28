@@ -1,25 +1,24 @@
-//app/scan/single-entry/page.tsx
 "use client";
 
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import PageLayout from "@/components/PageLayout";
 
-const scanTypes = [
-  { label: "Day 1 Breakfast", value: "day-1-breakfast" },
-  { label: "Day 1 Lunch", value: "day-1-lunch" },
-  { label: "Day 1 Dinner", value: "day-1-dinner" },
-  { label: "Kit Bag", value: "kit-bag" },
-  { label: "CME Book", value: "cme-book" },
+const certificateDays = [
+  { label: "Delegate Certificate with CME Points ", value: "delegate" },
+  { label: "Faculty Certificate with CME Points", value: "faculty" },
+  { label: "Free Paper Presentation Certificate", value: "free-paper" },
+  { label: "Award Paper Presentation Certificate", value: "award-paper" },
+  { label: "ePoster Presentation Certificate ", value: "eposter" },
 ];
 
-export default function ScanEntryListPage() {
+export default function CertificateDayListPage() {
   const router = useRouter();
 
   return (
-    <PageLayout title="Single Entry Scan List">
+    <PageLayout title="Certificate Printing">
       <div className="max-w-2xl mx-auto space-y-4">
-        {scanTypes.map((item, i) => (
+        {certificateDays.map((item, i) => (
           <div
             key={item.value}
             className={`flex justify-between items-center px-6 py-4 rounded-lg ${
@@ -30,7 +29,7 @@ export default function ScanEntryListPage() {
 
             <Button
               className="bg-green-600 hover:bg-green-700 text-white px-6"
-              onClick={() => router.push(`/scan/single-entry/${item.value}`)}
+              onClick={() => router.push(`/certificate/search/${item.value}`)}
             >
               Enter
             </Button>

@@ -1,14 +1,22 @@
 "use client";
 
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { ArrowLeft, Search, User, Mail, Building, Briefcase, Tag } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
-import { useToast } from '@/hooks/use-toast';
-import Link from 'next/link';
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import {
+  ArrowLeft,
+  Search,
+  User,
+  Mail,
+  Building,
+  Briefcase,
+  Tag,
+} from "lucide-react";
+import { supabase } from "@/lib/supabase";
+import { useToast } from "@/hooks/use-toast";
+import Link from "next/link";
 
 interface Attendee {
   id: string;
@@ -25,7 +33,7 @@ interface Attendee {
 }
 
 export default function ManualSearchPage() {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [attendees, setAttendees] = useState<Attendee[]>([]);
   const [searching, setSearching] = useState(false);
   const { toast } = useToast();
@@ -43,12 +51,12 @@ export default function ManualSearchPage() {
     setSearching(true);
     try {
       const { data, error } = await supabase
-        .from('attendees')
-        .select('*')
+        .from("attendees")
+        .select("*")
         .or(
-          `registration_number.ilike.%${searchQuery}%,name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%,phone.ilike.%${searchQuery}%,organization.ilike.%${searchQuery}%`
+          `registration_number.ilike.%${searchQuery}%,name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%,phone.ilike.%${searchQuery}%,organization.ilike.%${searchQuery}%`,
         )
-        .order('name');
+        .order("name");
 
       if (error) throw error;
 
@@ -81,8 +89,12 @@ export default function ManualSearchPage() {
             </Button>
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-primary text-white">Manual Search</h1>
-            <p className="text-sm text-muted-foreground">Search attendees by any criteria</p>
+            <h1 className="text-2xl font-bold text-primary text-white">
+              Manual Search
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Search attendees by any criteria
+            </p>
           </div>
         </div>
       </header>
@@ -96,21 +108,26 @@ export default function ManualSearchPage() {
             <div className="flex gap-4">
               <div className="flex-1">
                 <Label htmlFor="search">
-                  Search by Registration Number, Name, Email, Phone, or Organization
+                  Search by Registration Number, Name, Email, Phone, or
+                  Organization
                 </Label>
                 <Input
                   id="search"
                   placeholder="Enter search term..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                  onKeyPress={(e) => e.key === "Enter" && handleSearch()}
                   className="mt-2 h-11"
                 />
               </div>
               <div className="flex items-end">
-                <Button onClick={handleSearch} disabled={searching} className="gap-2 h-11">
+                <Button
+                  onClick={handleSearch}
+                  disabled={searching}
+                  className="gap-2 h-11"
+                >
                   <Search className="w-4 h-4" />
-                  {searching ? 'Searching...' : 'Search'}
+                  {searching ? "Searching..." : "Search"}
                 </Button>
               </div>
             </div>
@@ -131,7 +148,9 @@ export default function ManualSearchPage() {
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div>
-                        <h3 className="text-xl font-bold text-primary mb-1">{attendee.name}</h3>
+                        <h3 className="text-xl font-bold text-primary mb-1">
+                          {attendee.name}
+                        </h3>
                         <div className="flex gap-2 flex-wrap">
                           <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full">
                             {attendee.registration_number}
@@ -158,19 +177,19 @@ export default function ManualSearchPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                       <div className="flex items-center gap-2 text-muted-foreground">
                         <Mail className="w-4 h-4" />
-                        <span>{attendee.email || 'N/A'}</span>
+                        <span>{attendee.email || "N/A"}</span>
                       </div>
                       <div className="flex items-center gap-2 text-muted-foreground">
                         <User className="w-4 h-4" />
-                        <span>{attendee.phone || 'N/A'}</span>
+                        <span>{attendee.phone || "N/A"}</span>
                       </div>
                       <div className="flex items-center gap-2 text-muted-foreground">
                         <Building className="w-4 h-4" />
-                        <span>{attendee.organization || 'N/A'}</span>
+                        <span>{attendee.organization || "N/A"}</span>
                       </div>
                       <div className="flex items-center gap-2 text-muted-foreground">
                         <Briefcase className="w-4 h-4" />
-                        <span>{attendee.designation || 'N/A'}</span>
+                        <span>{attendee.designation || "N/A"}</span>
                       </div>
                       <div className="flex items-center gap-2 text-muted-foreground">
                         <Tag className="w-4 h-4" />

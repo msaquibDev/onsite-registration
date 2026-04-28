@@ -1,3 +1,4 @@
+//app/scan/single-entry/[type]/ScanClientPage.tsx
 "use client";
 
 import { useState } from "react";
