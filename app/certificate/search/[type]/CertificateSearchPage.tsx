@@ -1,3 +1,4 @@
+//app/certificate/search/[type]/CertificateSearchPage.tsxs
 "use client";
 
 import { useState } from "react";
@@ -5,22 +6,16 @@ import PageLayout from "@/components/PageLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Award, Edit } from "lucide-react";
+import { Search, Award } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Attendee {
   id: string;
   registration_number: string;
   name: string;
-  email: string;
-  organization: string;
-  designation: string;
   category: string;
-  city?: string;
-  mobile?: string;
   certificate_printed: boolean;
   printed_at?: string;
-  event_id: string;
 }
 
 export default function CertificateSearchPage({ type }: { type: string }) {
@@ -30,39 +25,25 @@ export default function CertificateSearchPage({ type }: { type: string }) {
   const [attendees, setAttendees] = useState<Attendee[]>([]);
   const [searching, setSearching] = useState(false);
 
-  const formattedType = (type || "certificate")
+  const formattedType = type
     .replace(/-/g, " ")
     .replace(/\b\w/g, (c) => c.toUpperCase());
 
-  // 🔥 Dummy Data
   const dummyData: Attendee[] = [
     {
       id: "1",
       registration_number: "DEL001",
       name: "Dr. Sharma",
-      email: "sharma@gmail.com",
-      organization: "AIIMS",
-      designation: "Doctor",
       category: "Delegate",
-      city: "Delhi",
-      mobile: "9876543210",
       certificate_printed: false,
-      printed_at: "",
-      event_id: "1",
     },
     {
       id: "2",
       registration_number: "FAC002",
       name: "Dr. Rao",
-      email: "rao@gmail.com",
-      organization: "Apollo",
-      designation: "Faculty",
       category: "Faculty",
-      city: "Hyderabad",
-      mobile: "9123456780",
       certificate_printed: true,
       printed_at: new Date().toISOString(),
-      event_id: "1",
     },
   ];
 
@@ -84,8 +65,7 @@ export default function CertificateSearchPage({ type }: { type: string }) {
           item.registration_number
             .toLowerCase()
             .includes(searchQuery.toLowerCase()) ||
-          item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          item.email.toLowerCase().includes(searchQuery.toLowerCase()),
+          item.name.toLowerCase().includes(searchQuery.toLowerCase()),
       );
 
       setAttendees(filtered);
@@ -107,20 +87,14 @@ export default function CertificateSearchPage({ type }: { type: string }) {
     toast({ title: "Printed (Dummy)" });
   };
 
-  const formatDate = (d?: string) => {
-    if (!d) return "-";
-    return new Date(d).toLocaleString("en-IN");
-  };
-
   return (
     <PageLayout
       title={`Certificate Printing : ${formattedType}`}
-      showBackButton
-      backButtonHref="/certificate"
-      showSignOut
+      showBackButton={true}
+      backButtonHref="/certificate/search"
+      showSignOut={true}
     >
-      <main className="p-6 max-w-7xl mx-auto">
-        {/* SEARCH */}
+      <main className="p-6 max-w-6xl mx-auto">
         <Card className="mb-6">
           <CardContent className="p-4 flex gap-4">
             <Input
@@ -129,27 +103,29 @@ export default function CertificateSearchPage({ type }: { type: string }) {
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             />
-            <Button onClick={handleSearch} className="bg-[#D96F28] text-white">
+            <Button
+              onClick={handleSearch}
+              className="bg-[#D96F28] hover:bg-[#C15D20] text-white"
+            >
               <Search className="w-4 h-4 mr-2" />
               {searching ? "Searching..." : "Search"}
             </Button>
           </CardContent>
         </Card>
 
-        {/* TABLE */}
         {attendees.length > 0 && (
           <Card>
             <CardHeader>
               <CardTitle>Results ({attendees.length})</CardTitle>
             </CardHeader>
             <CardContent>
-              <table className="w-full text-sm border">
+              <table className="w-full border text-sm">
                 <thead className="bg-gray-100">
                   <tr>
                     <th className="p-2 border">UID</th>
                     <th className="p-2 border">Name</th>
                     <th className="p-2 border">Category</th>
-                    <th className="p-2 border">Printed At</th>
+                    <th className="p-2 border">Printed</th>
                     <th className="p-2 border">Action</th>
                   </tr>
                 </thead>
@@ -161,7 +137,7 @@ export default function CertificateSearchPage({ type }: { type: string }) {
                       <td className="p-2 border">{att.name}</td>
                       <td className="p-2 border">{att.category}</td>
                       <td className="p-2 border">
-                        {formatDate(att.printed_at)}
+                        {att.certificate_printed ? "Yes" : "No"}
                       </td>
                       <td className="p-2 border">
                         <Button
@@ -169,8 +145,8 @@ export default function CertificateSearchPage({ type }: { type: string }) {
                           onClick={() => handlePrint(att)}
                           className={
                             att.certificate_printed
-                              ? "bg-red-500"
-                              : "bg-green-600"
+                              ? "bg-red-500 hover:bg-red-600 text-white"
+                              : "bg-green-600 hover:bg-green-700 text-white"
                           }
                         >
                           <Award className="w-4 h-4 mr-1" />

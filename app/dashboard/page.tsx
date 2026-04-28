@@ -97,14 +97,8 @@ export default function DashboardPage() {
     {
       icon: Award,
       title: "Certificate Printing",
-      href: "/certificate",
+      href: "/certificate/search",
       bgColor: "bg-purple-500",
-    },
-    {
-      icon: IdCard,
-      title: "Self Badge Printing",
-      href: "/self-badge-printing",
-      bgColor: "bg-orange-500",
     },
     {
       icon: Printer,
@@ -112,12 +106,6 @@ export default function DashboardPage() {
       href: "/self-badge-printing",
       bgColor: "bg-orange-500",
     },
-    // {
-    //   icon: Printer,
-    //   title: "Badge Printing Kiosk",
-    //   href: "/self-badge-printing",
-    //   bgColor: "bg-orange-500",
-    // },
     {
       icon: Award,
       title: "Certificate Printing Kiosk",
@@ -130,49 +118,16 @@ export default function DashboardPage() {
       href: "/attendance-scanning",
       bgColor: "bg-indigo-500",
     },
-    // {
-    //   icon: Search,
-    //   title: "Manual Search",
-    //   href: "/manual-search",
-    //   bgColor: "bg-cyan-500",
-    // },
-    // {
-    //   icon: UserPlus,
-    //   title: "Visitor Registration",
-    //   href: "/visitor-registration",
-    //   bgColor: "bg-teal-500",
-    // },
-    // {
-    //   icon: Globe,
-    //   title: "Scan by Website",
-    //   href: "/scan-by-website",
-    //   bgColor: "bg-amber-500",
-    // },
     {
       icon: UserPlus,
       title: "Add Registration",
       href: "/add-registration",
       bgColor: "bg-rose-500",
     },
-    {
-      icon: IdCard,
-      title: "Self Badge Printing",
-      href: "/self-badge-printing",
-      bgColor: "bg-orange-500",
-    },
   ];
 
   return (
     <div className="min-h-screen flex" style={{ backgroundColor: "#000000A6" }}>
-      {/* Left Side - Image */}
-      {/* <div
-        className="hidden lg:block lg:w-1/3 relative bg-cover bg-center"
-        style={{ backgroundImage: "url('/dashboard-side-image.jpg')" }}
-      >
-        <div className="absolute inset-0 bg-black/30"></div>
-      </div> */}
-
-      {/* Right Side - Content */}
       <div
         className="flex-1 flex flex-col w-full lg:w-2/3"
         style={{

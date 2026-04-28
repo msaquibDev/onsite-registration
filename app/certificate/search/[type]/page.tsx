@@ -1,3 +1,4 @@
+//app/certificate/search/[type]/page.tsx
 import CertificateSearchPage from "./CertificateSearchPage";
 
 export function generateStaticParams() {
