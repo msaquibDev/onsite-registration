@@ -1,25 +1,16 @@
 // components/Footer.tsx
 "use client";
 
-interface FooterProps {
-  backgroundColor?: string;
-  textColor?: string;
-  className?: string;
-}
-
-export default function Footer({
-  backgroundColor = "#D96F28",
-  textColor = "text-white",
-  className = "",
-}: FooterProps) {
+export default function Footer({}) {
   return (
-    <footer className={`py-4 ${className}`} style={{ backgroundColor }}>
-      <div className="container mx-auto px-4">
-        <p className={`text-xs text-center ${textColor}`}>
-          © RegistrationTeam.in by SaaScraft Studio (India) Pvt. Ltd. | All
-          Rights Reserved.
-        </p>
-      </div>
+    <footer
+      className="border-t py-4 px-6"
+      style={{ backgroundColor: "#D96F28" }}
+    >
+      <p className="text-xs text-white text-center">
+        © RegistrationTeam.in by SaaScraft Studio (India) Pvt. Ltd. | All Rights
+        Reserved.
+      </p>
     </footer>
   );
 }

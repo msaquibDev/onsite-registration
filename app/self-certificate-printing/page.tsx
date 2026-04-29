@@ -112,11 +112,35 @@ export default function SelfCertificatePrintingPage() {
           />
         </div>
 
-        {/* ✅ Tabs */}
         <Tabs value={tab} onValueChange={setTab}>
-          <TabsList className="grid grid-cols-2">
-            <TabsTrigger value="scan">Scan your QR Code</TabsTrigger>
-            <TabsTrigger value="search">Search Name / Reg No</TabsTrigger>
+          <TabsList className="grid grid-cols-2 bg-[#FFEADA] p-1 rounded-lg">
+            <TabsTrigger
+              value="scan"
+              className="
+        rounded-md
+        text-gray-700
+        data-[state=active]:bg-[#D96F28]
+        data-[state=active]:text-white
+        data-[state=active]:shadow-none
+        hover:text-[#D96F28]
+      "
+            >
+              Scan your QR Code
+            </TabsTrigger>
+
+            <TabsTrigger
+              value="search"
+              className="
+        rounded-md
+        text-gray-700
+        data-[state=active]:bg-[#D96F28]
+        data-[state=active]:text-white
+        data-[state=active]:shadow-none
+        hover:text-[#D96F28]
+      "
+            >
+              Search Name / Reg No
+            </TabsTrigger>
           </TabsList>
         </Tabs>
 

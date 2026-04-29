@@ -112,11 +112,33 @@ export default function SelfBadgePrintingPage() {
           />
         </div>
 
-        {/* ✅ Tabs */}
         <Tabs value={tab} onValueChange={setTab}>
-          <TabsList className="grid grid-cols-2">
-            <TabsTrigger value="scan">Scan your QR Code</TabsTrigger>
-            <TabsTrigger value="search">Search Name / Reg No</TabsTrigger>
+          <TabsList className="grid grid-cols-2 bg-[#FFEADA] p-1 rounded-lg">
+            <TabsTrigger
+              value="scan"
+              className="
+        data-[state=active]:bg-[#D96F28]
+        data-[state=active]:text-white
+        text-gray-700
+        rounded-md
+        hover:bg-[#FFD6BD]
+      "
+            >
+              Scan your QR Code
+            </TabsTrigger>
+
+            <TabsTrigger
+              value="search"
+              className="
+        data-[state=active]:bg-[#D96F28]
+        data-[state=active]:text-white
+        text-gray-700
+        rounded-md
+        hover:bg-[#FFD6BD]
+      "
+            >
+              Search Name / Reg No
+            </TabsTrigger>
           </TabsList>
         </Tabs>
 

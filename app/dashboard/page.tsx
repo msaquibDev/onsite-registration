@@ -21,6 +21,8 @@ import {
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
+import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 
 // Kiosk Card Component
 const KioskCard = ({
@@ -65,15 +67,6 @@ export default function DashboardPage() {
       router.push("/login");
     }
   }, [router]);
-
-  const handleSignOut = () => {
-    localStorage.removeItem("isLoggedIn");
-    toast({
-      title: "Signed Out",
-      description: "You have been signed out successfully.",
-    });
-    router.push("/login");
-  };
 
   const kiosks = [
     {
@@ -135,20 +128,7 @@ export default function DashboardPage() {
         }}
       >
         {/* Header */}
-        <header className="bg-gradient-to-r from-[#242367] to-[#D96F28] px-6 py-4">
-          <div className="flex justify-between items-center">
-            <div className="w-24">
-              <img src="/logo.png" alt="Logo" className="w-full h-auto" />
-            </div>
-            <Button
-              onClick={handleSignOut}
-              className="bg-white hover:bg-gray-100 text-[#D96F28]"
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              Sign Out
-            </Button>
-          </div>
-        </header>
+        <Header />
 
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto p-6">
@@ -172,15 +152,7 @@ export default function DashboardPage() {
         </main>
 
         {/* Footer */}
-        <footer
-          className="border-t py-4 px-6"
-          style={{ backgroundColor: "#D96F28" }}
-        >
-          <p className="text-xs text-white text-center">
-            © RegistrationTeam.in by SaaScraft Studio (India) Pvt. Ltd. | All
-            Rights Reserved.
-          </p>
-        </footer>
+        <Footer />
       </div>
     </div>
   );

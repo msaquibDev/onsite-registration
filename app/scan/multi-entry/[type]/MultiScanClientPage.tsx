@@ -58,12 +58,46 @@ export default function MultiScanClientPage({ type }: { type: string }) {
       }`}
     >
       <div className="max-w-6xl mx-auto space-y-6">
-        {/* Tabs */}
         <Tabs value={tab} onValueChange={setTab}>
-          <TabsList className="grid grid-cols-3">
-            <TabsTrigger value="hardware">QR via Hardware</TabsTrigger>
-            <TabsTrigger value="website">QR via Website</TabsTrigger>
-            <TabsTrigger value="manual">Manual Scan</TabsTrigger>
+          <TabsList className="grid grid-cols-3 bg-[#FFEADA] p-1 rounded-lg">
+            <TabsTrigger
+              value="hardware"
+              className="
+        data-[state=active]:bg-[#D96F28]
+        data-[state=active]:text-white
+        text-gray-700
+        rounded-md
+        hover:bg-[#FFD6BD]
+      "
+            >
+              QR via Hardware
+            </TabsTrigger>
+
+            <TabsTrigger
+              value="website"
+              className="
+        data-[state=active]:bg-[#D96F28]
+        data-[state=active]:text-white
+        text-gray-700
+        rounded-md
+        hover:bg-[#FFD6BD]
+      "
+            >
+              QR via Website
+            </TabsTrigger>
+
+            <TabsTrigger
+              value="manual"
+              className="
+        data-[state=active]:bg-[#D96F28]
+        data-[state=active]:text-white
+        text-gray-700
+        rounded-md
+        hover:bg-[#FFD6BD]
+      "
+            >
+              Manual Scan
+            </TabsTrigger>
           </TabsList>
         </Tabs>
 

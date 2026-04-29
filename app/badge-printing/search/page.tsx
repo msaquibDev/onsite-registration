@@ -5,6 +5,7 @@ import PageLayout from "@/components/PageLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import {
   Table,
@@ -95,97 +96,95 @@ export default function BadgePrintingPage() {
 
   return (
     <PageLayout title="Badge Printing">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* 🔍 Search */}
-        <div className="flex gap-3">
-          <Input
-            placeholder="Search registered attendees"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="h-12 rounded-full px-5 border-gray-200 focus:border-[#D96F28] focus:ring-[#D96F28] bg-white"
-          />
-          <Button
-            onClick={handleSearch}
-            className="bg-[#D96F28] hover:bg-[#C15D20] text-white rounded-full px-6"
-          >
-            <Search className="w-4 h-4 mr-2" />
-            {loading ? "Searching..." : "Search"}
-          </Button>
-        </div>
+      <div className="max-w-6xl mx-auto space-y-6">
+        {/* 🔍 SEARCH (MATCHED WITH CERTIFICATE PAGE) */}
+        <Card className="mb-6">
+          <CardContent className="p-4 flex gap-4">
+            <Input
+              placeholder="Search..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              className="border-gray-200 focus:border-[#D96F28] focus:ring-[#D96F28] bg-white rounded-lg"
+            />
 
-        {/* 📊 Table */}
-        <div className="rounded-xl border bg-white shadow-sm overflow-hidden">
-          <Table>
-            <TableHeader className="bg-[#EBD5C3]">
-              <TableRow>
-                <TableHead>Action</TableHead>
-                <TableHead>UID / Reg#</TableHead>
-                <TableHead>Full Name</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>City / 2nd Line</TableHead>
-                <TableHead>Mobile</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Date/Time</TableHead>
-              </TableRow>
-            </TableHeader>
+            <Button
+              onClick={handleSearch}
+              className="bg-[#D96F28] hover:bg-[#C15D20] text-white"
+            >
+              <Search className="w-4 h-4 mr-2" />
+              {loading ? "Searching..." : "Search"}
+            </Button>
+          </CardContent>
+        </Card>
 
-            <TableBody>
-              {data.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={8} className="text-center py-6">
-                    No data found
-                  </TableCell>
-                </TableRow>
-              ) : (
-                data.map((item) => (
-                  <TableRow key={item.id}>
-                    {/* ACTION */}
-                    <TableCell className="flex gap-2">
-                      {item.printed ? (
-                        <Button
-                          size="sm"
-                          className="bg-red-600 hover:bg-red-700"
-                        >
-                          <Printer className="w-4 h-4 mr-1" />
-                          Printed
+        {/* 📊 TABLE (MATCHED STYLE) */}
+        {data.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Results ({data.length})</CardTitle>
+            </CardHeader>
+
+            <CardContent>
+              <table className="w-full border text-sm">
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th className="p-2 border">Action</th>
+                    <th className="p-2 border">UID / Reg#</th>
+                    <th className="p-2 border">Full Name</th>
+                    <th className="p-2 border">Category</th>
+                    <th className="p-2 border">City</th>
+                    <th className="p-2 border">Mobile</th>
+                    <th className="p-2 border">Email</th>
+                    <th className="p-2 border">Date/Time</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {data.map((item) => (
+                    <tr key={item.id}>
+                      <td className="p-2 border space-x-2">
+                        {item.printed ? (
+                          <Button
+                            size="sm"
+                            className="bg-red-500 hover:bg-red-600 text-white"
+                          >
+                            <Printer className="w-4 h-4 mr-1" />
+                            Printed
+                          </Button>
+                        ) : (
+                          <Button
+                            size="sm"
+                            onClick={() => handlePrint(item.id)}
+                            className="bg-green-600 hover:bg-green-700 text-white"
+                          >
+                            <Printer className="w-4 h-4 mr-1" />
+                            Print
+                          </Button>
+                        )}
+
+                        <Button size="sm" variant="outline">
+                          <Pencil className="w-4 h-4" />
                         </Button>
-                      ) : (
-                        <Button
-                          size="sm"
-                          onClick={() => handlePrint(item.id)}
-                          className="bg-green-600 hover:bg-green-700"
-                        >
-                          <Printer className="w-4 h-4 mr-1" />
-                          Print
-                        </Button>
-                      )}
+                      </td>
 
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        className="bg-blue-600 hover:bg-blue-700 text-white"
-                      >
-                        <Pencil className="w-4 h-4 mr-1" />
-                        Edit
-                      </Button>
-                    </TableCell>
+                      <td className="p-2 border">{item.id}</td>
+                      <td className="p-2 border">{item.name}</td>
+                      <td className="p-2 border">{item.category}</td>
+                      <td className="p-2 border">{item.city}</td>
+                      <td className="p-2 border">{item.mobile}</td>
+                      <td className="p-2 border">{item.email}</td>
 
-                    {/* DATA */}
-                    <TableCell>{item.id}</TableCell>
-                    <TableCell>{item.name}</TableCell>
-                    <TableCell>{item.category}</TableCell>
-                    <TableCell>{item.city}</TableCell>
-                    <TableCell>{item.mobile}</TableCell>
-                    <TableCell>{item.email}</TableCell>
-
-                    {/* DATE */}
-                    <TableCell>{item.printed ? item.printedAt : "-"}</TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
+                      <td className="p-2 border">
+                        {item.printed ? item.printedAt : "-"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </PageLayout>
   );

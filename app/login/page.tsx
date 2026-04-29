@@ -9,6 +9,9 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Mail, Lock, Eye, EyeOff, Fingerprint } from "lucide-react";
+import Footer from "@/components/Footer";
+import { Head } from "react-day-picker";
+import Header from "@/components/Header";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -57,20 +60,8 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Header with gradient */}
-      <header className="bg-gradient-to-r from-[#242367] to-[#D96F28] py-4">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-center">
-            <div className="w-32">
-              <img
-                src="/logo.png"
-                alt="Logo"
-                className="w-full h-auto brightness-0 invert"
-              />
-            </div>
-          </div>
-        </div>
-      </header>
+      {/* <Header> */}
+      <Header showBackButton={false} showSignOut={false} />
 
       {/* Main Content with page background */}
       <main
@@ -205,14 +196,7 @@ export default function LoginPage() {
       </main>
 
       {/* Footer */}
-      <footer className="py-4" style={{ backgroundColor: "#D96F28" }}>
-        <div className="container mx-auto px-4">
-          <p className="text-xs text-white text-center">
-            © RegistrationTeam.in by SaaScraft Studio (India) Pvt. Ltd. | All
-            Rights Reserved.
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
