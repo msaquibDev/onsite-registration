@@ -92,6 +92,7 @@ export default function AddRegistrationPage() {
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
+                className="border-gray-200 focus:border-[#D96F28] focus:ring-[#D96F28] bg-white rounded-lg"
               />
             </div>
 
@@ -102,20 +103,23 @@ export default function AddRegistrationPage() {
                 onChange={(e) =>
                   setFormData({ ...formData, place: e.target.value })
                 }
+                className="border-gray-200 focus:border-[#D96F28] focus:ring-[#D96F28] bg-white rounded-lg"
               />
             </div>
 
             <div>
               <Label>Registration / Badge Category *</Label>
+
               <Select
                 value={formData.category}
                 onValueChange={(val) =>
                   setFormData({ ...formData, category: val })
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger className="border-gray-200 focus:border-[#D96F28] focus:ring-0 focus:outline-none bg-white rounded-lg">
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
+
                 <SelectContent>
                   <SelectItem value="delegate">Delegate</SelectItem>
                   <SelectItem value="faculty">Faculty</SelectItem>
@@ -132,6 +136,7 @@ export default function AddRegistrationPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, mobile: e.target.value })
                   }
+                  className="border-gray-200 focus:border-[#D96F28] focus:ring-[#D96F28] bg-white rounded-lg"
                 />
               </div>
 
@@ -142,6 +147,7 @@ export default function AddRegistrationPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
                   }
+                  className="border-gray-200 focus:border-[#D96F28] focus:ring-[#D96F28] bg-white rounded-lg"
                 />
               </div>
             </div>
@@ -153,6 +159,7 @@ export default function AddRegistrationPage() {
                 onChange={(e) =>
                   setFormData({ ...formData, reference: e.target.value })
                 }
+                className="border-gray-200 focus:border-[#D96F28] focus:ring-[#D96F28] bg-white rounded-lg"
               />
             </div>
           </CardContent>
@@ -168,7 +175,10 @@ export default function AddRegistrationPage() {
               onClick={() => setScanAllowed(false)}
               className="flex items-center gap-2 cursor-pointer"
             >
-              <Checkbox checked={!scanAllowed} />
+              <Checkbox
+                checked={!scanAllowed}
+                className="data-[state=checked]:bg-red-500 data-[state=checked]:border-red-500"
+              />
               <span className="text-red-600 font-medium">Not Allowed</span>
             </div>
 
@@ -177,7 +187,10 @@ export default function AddRegistrationPage() {
               onClick={() => setScanAllowed(true)}
               className="flex items-center gap-2 cursor-pointer"
             >
-              <Checkbox checked={scanAllowed} />
+              <Checkbox
+                checked={scanAllowed}
+                className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+              />
               <span className="text-green-600 font-medium">Allowed</span>
             </div>
           </div>
@@ -191,16 +204,25 @@ export default function AddRegistrationPage() {
             return (
               <div
                 key={item}
-                className={`flex items-center gap-2 border rounded-md p-2 cursor-pointer ${
+                className={`flex items-center gap-2 border rounded-md p-2 cursor-pointer transition ${
                   isChecked
                     ? scanAllowed
                       ? "border-green-500 bg-green-50"
                       : "border-red-500 bg-red-50"
-                    : ""
+                    : "border-gray-200"
                 }`}
                 onClick={() => togglePermission(item)}
               >
-                <Checkbox checked={isChecked} />
+                <Checkbox
+                  checked={isChecked}
+                  className={
+                    isChecked
+                      ? scanAllowed
+                        ? "data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+                        : "data-[state=checked]:bg-red-500 data-[state=checked]:border-red-500"
+                      : ""
+                  }
+                />
 
                 <span
                   className={`text-sm ${
@@ -208,7 +230,7 @@ export default function AddRegistrationPage() {
                       ? scanAllowed
                         ? "text-green-700"
                         : "text-red-600"
-                      : ""
+                      : "text-gray-700"
                   }`}
                 >
                   {item}

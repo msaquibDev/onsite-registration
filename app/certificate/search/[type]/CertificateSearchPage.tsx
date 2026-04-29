@@ -102,6 +102,7 @@ export default function CertificateSearchPage({ type }: { type: string }) {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              className="border-gray-200 focus:border-[#D96F28] focus:ring-[#D96F28] bg-white rounded-lg"
             />
             <Button
               onClick={handleSearch}
@@ -112,7 +113,6 @@ export default function CertificateSearchPage({ type }: { type: string }) {
             </Button>
           </CardContent>
         </Card>
-
         {attendees.length > 0 && (
           <Card>
             <CardHeader>

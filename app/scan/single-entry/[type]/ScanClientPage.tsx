@@ -74,7 +74,7 @@ export default function ScanClientPage({ type }: { type: string }) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleScan()}
-            className="h-12"
+            className=" border-gray-200 focus:border-[#D96F28] focus:ring-[#D96F28] bg-white rounded-lg"
           />
         )}
 
@@ -94,6 +94,7 @@ export default function ScanClientPage({ type }: { type: string }) {
                 placeholder="Search attendees"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
+                className="border-gray-200 focus:border-[#D96F28] focus:ring-[#D96F28] bg-white rounded-lg"
               />
               <Button
                 onClick={handleScan}

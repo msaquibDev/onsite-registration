@@ -128,6 +128,7 @@ export default function AttendanceSearchPage({ type }: { type: string }) {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              className="border-gray-200 focus:border-[#D96F28] focus:ring-[#D96F28] bg-white rounded-lg"
             />
             <Button onClick={handleSearch} className="bg-[#D96F28] text-white">
               <Search className="w-4 h-4 mr-2" />

@@ -144,6 +144,7 @@ export default function SelfCertificatePrintingPage() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              className="border-gray-200 focus:border-[#D96F28] focus:ring-[#D96F28] bg-white rounded-lg"
             />
             <Button
               onClick={handleSearch}

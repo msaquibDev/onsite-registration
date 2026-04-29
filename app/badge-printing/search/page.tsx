@@ -102,7 +102,7 @@ export default function BadgePrintingPage() {
             placeholder="Search registered attendees"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="h-12 rounded-full px-5"
+            className="h-12 rounded-full px-5 border-gray-200 focus:border-[#D96F28] focus:ring-[#D96F28] bg-white"
           />
           <Button
             onClick={handleSearch}
